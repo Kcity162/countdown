@@ -2,10 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Calendar Event Countdown</title>
     <style>
-        /* [Your existing CSS styles go here] */
-        /* ... */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .clock {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flip-card {
+            position: relative;
+            background-color: #333;
+            color: white;
+            font-size: 4em;
+            width: 100px;
+            height: 150px;
+            text-align: center;
+            line-height: 120px;
+            border-radius: 10px;
+        }
+
+        .flip-card span {
+            display: block;
+        }
+
+        .flip-card small {
+            font-size: 0.3em;
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            margin-bottom: 10px;
+        }
+
+        .outline-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #28a745;
+            background-color: white;
+            color: #28a745;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .outline-button:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .flash-red {
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0% { background-color: #333; }
+            50% { background-color: red; }
+            100% { background-color: #333; }
+        }
+
+        /* Event details styling */
+        .event-details {
+            font-size: 1.2em;
+            margin: 20px;
+            color: #333;
+        }
+
     </style>
     <!-- Load Google API Client Library and Google Identity Services Library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -13,13 +118,16 @@
 </head>
 <body>
     <div class="input-container">
-        <!-- [Your existing HTML content goes here] -->
-        <!-- ... -->
-        <!-- Google Sign-In Button -->
+        <input type="datetime-local" id="countdownDate" />
+        <div class="button-container">
+            <button class="outline-button" onclick="adjustTime(5)">+5 mins</button>
+            <button class="outline-button" onclick="adjustTime(10)">+10 mins</button>
+            <button class="outline-button" onclick="adjustTime(15)">+15 mins</button>
+            <button class="outline-button" onclick="adjustTime(25)">+25 mins</button>
+        </div>
         <div id="g_id_onload"
              data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
              data-callback="handleCredentialResponse"
-             data-scope="https://www.googleapis.com/auth/calendar.readonly"
              data-auto_prompt="false">
         </div>
         <div class="g_id_signin" data-type="standard"></div>
@@ -29,22 +137,22 @@
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
-    <p>3</p>
-    <!-- Countdown Clock -->
+
     <div class="clock" id="clock">
-        <!-- [Your existing clock HTML goes here] -->
-        <!-- ... -->
+        <div class="flip-card"><span id="days">00</span><small>Days</small></div>
+        <div class="flip-card"><span id="hours">00</span><small>Hours</small></div>
+        <div class="flip-card"><span id="minutes">00</span><small>Minutes</small></div>
+        <div class="flip-card"><span id="seconds">00</span><small>Seconds</small></div>
     </div>
 
-    <!-- Add sound element -->
-    <!-- Replace with a valid sound file URL or host it locally -->
-    <audio id="alarmSound" src="/alarm.mp3"></audio>
+    <!-- Add sound element (using alarm.mp3 in the root of the project) -->
+    <audio id="alarmSound" src="./alarm.mp3"></audio>
 
     <script>
         let countdownInterval;
         const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
-        const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+        const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
         // Ensure the gapi client library is loaded
         function initializeGapiClient() {
@@ -62,6 +170,7 @@
         // Handle the response from Google Identity Services (GIS)
         async function handleCredentialResponse(response) {
             const token = response.credential; // Extract the credential token
+            console.log('Credential Token:', token); // Log the token to verify
 
             // Initialize Google API client using token
             await initializeGapiClient();
@@ -76,7 +185,7 @@
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() {
             gapi.client.calendar.events.list({
-                'calendarId': 'kevin.torrington@googlemail.com', // Use 'primary' to access the user's primary calendar
+                'calendarId': 'kevin.torrington@gmail.com',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
@@ -85,19 +194,19 @@
             }).then(function(response) {
                 const events = response.result.items;
                 const eventDetailsElement = document.getElementById('eventDetails');
-
+                
                 if (events.length > 0) {
                     const nextEvent = events[0];
                     const eventTitle = nextEvent.summary || 'No title';
                     const startTime = nextEvent.start.dateTime || nextEvent.start.date;
-
+                    
                     // Update event details
                     eventDetailsElement.innerHTML = `Next Event: <strong>${eventTitle}</strong> at <strong>${new Date(startTime).toLocaleString()}</strong>`;
-
+                    
                     // Update countdown input field with the next event's start time
                     const countdownInput = document.getElementById("countdownDate");
                     countdownInput.value = startTime.slice(0, 16);  // Format for input field
-
+                    
                     // Automatically start the countdown
                     startCountdown(new Date(startTime));
                 } else {
