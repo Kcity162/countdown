@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Calendar Event Countdown</title>
+    <title>Google Calendar Event Countdown - 1</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -112,7 +112,7 @@
         }
 
     </style>
-    <!-- Load Google API Client Library and Google Identity Services Library -->
+    <!-- Load Google Identity Services library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
@@ -127,6 +127,7 @@
         </div>
         <div id="g_id_onload"
              data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
+             data-scope="https://www.googleapis.com/auth/calendar.readonly"
              data-callback="handleCredentialResponse"
              data-auto_prompt="false">
         </div>
@@ -175,7 +176,7 @@
             // Initialize Google API client using token
             await initializeGapiClient();
 
-            // Set the authorization token
+            // Exchange the token for an OAuth 2.0 access token
             gapi.client.setToken({ access_token: token });
 
             // Now list the upcoming events
@@ -185,7 +186,7 @@
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() {
             gapi.client.calendar.events.list({
-                'calendarId': 'kevin.torrington@gmail.com',
+                'calendarId': 'primary',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
