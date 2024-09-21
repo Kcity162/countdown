@@ -112,8 +112,9 @@
         }
 
     </style>
-    <!-- Load the new Google Identity Services library -->
+    <!-- Load Google API Client Library and Google Identity Services Library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
 <body>
     <div class="input-container">
@@ -136,8 +137,7 @@
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
-    <p>Added kevin.torrington@googlemail.com</p>
-
+    <p>1</p>
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
         <div class="flip-card"><span id="hours">00</span><small>Hours</small></div>
@@ -154,23 +154,31 @@
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
         const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
+        // Ensure the gapi client library is loaded
+        function initializeGapiClient() {
+            return new Promise((resolve) => {
+                gapi.load('client', async function() {
+                    await gapi.client.init({
+                        apiKey: API_KEY,
+                        discoveryDocs: DISCOVERY_DOCS
+                    });
+                    resolve();
+                });
+            });
+        }
+
         // Handle the response from Google Identity Services (GIS)
-        function handleCredentialResponse(response) {
+        async function handleCredentialResponse(response) {
             const token = response.credential; // Extract the credential token
 
-            // Initialize the Google API client using the token
-            gapi.load('client', async function() {
-                await gapi.client.init({
-                    apiKey: API_KEY,
-                    discoveryDocs: DISCOVERY_DOCS
-                });
+            // Initialize Google API client using token
+            await initializeGapiClient();
 
-                // Set the authorization token
-                gapi.client.setToken({ access_token: token });
+            // Set the authorization token
+            gapi.client.setToken({ access_token: token });
 
-                // Now list the upcoming events
-                listUpcomingEvents();
-            });
+            // Now list the upcoming events
+            listUpcomingEvents();
         }
 
         // Fetch the next upcoming event and update the countdown
