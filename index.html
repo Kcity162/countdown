@@ -176,7 +176,7 @@
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() {
             gapi.client.calendar.events.list({
-                'calendarId': 'primary',
+                'calendarId': 'kevin.torrington@gmail.com',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
