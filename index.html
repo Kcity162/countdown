@@ -17,7 +17,7 @@
         <!-- ... -->
         <!-- Google Sign-In Button -->
         <div id="g_id_onload"
-             data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+             data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
              data-callback="handleCredentialResponse"
              data-scope="https://www.googleapis.com/auth/calendar.readonly"
              data-auto_prompt="false">
@@ -29,7 +29,7 @@
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
-    <p>2</p>
+    <p>3</p>
     <!-- Countdown Clock -->
     <div class="clock" id="clock">
         <!-- [Your existing clock HTML goes here] -->
@@ -38,11 +38,11 @@
 
     <!-- Add sound element -->
     <!-- Replace with a valid sound file URL or host it locally -->
-    <audio id="alarmSound" src="https://example.com/path-to-your-audio-file.wav"></audio>
+    <audio id="alarmSound" src="/alarm.mp3"></audio>
 
     <script>
         let countdownInterval;
-        const API_KEY = 'YOUR_API_KEY';
+        const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
         const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
@@ -76,7 +76,7 @@
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() {
             gapi.client.calendar.events.list({
-                'calendarId': 'primary', // Use 'primary' to access the user's primary calendar
+                'calendarId': 'kevin.torrington@googlemail.com', // Use 'primary' to access the user's primary calendar
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
