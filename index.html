@@ -10,7 +10,7 @@
    
 </head>
 <body>
-    <p>Note: Changed libary</p>
+    <p>Note: Changed libary and added button</p>
     <div class="input-container">
         <input type="datetime-local" id="countdownDate" />
         <div class="button-container">
@@ -22,6 +22,13 @@
         <button onclick="handleAuthClick()">Login to Google</button>
     </div>
 
+    <div id="g_id_onload"
+     data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+    </div>
+
+    <div class="g_id_signin" data-type="standard"></div>
     <!-- Section to display event details -->
     <div class="event-details" id="eventDetails">
         No event loaded.

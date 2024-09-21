@@ -38,6 +38,24 @@ let countdownInterval;
             gapi.auth2.getAuthInstance().signIn();
         }
 
+        function handleCredentialResponse(response) {
+            const token = response.credential; // Extract the credential token
+        
+            // Initialize the Google API client using the token
+            gapi.load('client', async function() {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: DISCOVERY_DOCS
+                });
+        
+                // Set the authorization token
+                gapi.client.setToken({ access_token: token });
+        
+                // Now list the upcoming events
+                listUpcomingEvents();
+            });
+        }
+
         // Periodically check for new events
         function startEventCheckInterval() {
             if (eventCheckInterval) clearInterval(eventCheckInterval); // Clear any existing interval
