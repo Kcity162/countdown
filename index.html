@@ -112,9 +112,8 @@
         }
 
     </style>
-    <!-- Load Google Identity Services library -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <!-- Load Google API Client Library -->
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
     <div class="input-container">
@@ -125,19 +124,14 @@
             <button class="outline-button" onclick="adjustTime(15)">+15 mins</button>
             <button class="outline-button" onclick="adjustTime(25)">+25 mins</button>
         </div>
-        <div id="g_id_onload"
-             data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
-             data-scope="https://www.googleapis.com/auth/calendar.readonly"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
+        <button onclick="handleAuthClick()">Sign In to Google</button>
+        <button onclick="listUpcomingEvents()">Get Next Event</button>
     </div>
 
     <!-- Section to display event details -->
     <div class="event-details" id="eventDetails">
         No event loaded.
-        <h1>1</h1>
+        <p>Changed again</p>
     </div>
 
     <div class="clock" id="clock">
@@ -152,36 +146,47 @@
 
     <script>
         let countdownInterval;
+        const CLIENT_ID = '769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
         const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-        // Ensure the gapi client library is loaded
-        function initializeGapiClient() {
-            return new Promise((resolve) => {
-                gapi.load('client', async function() {
-                    await gapi.client.init({
-                        apiKey: API_KEY,
-                        discoveryDocs: DISCOVERY_DOCS
-                    });
-                    resolve();
-                });
+        function handleClientLoad() {
+            gapi.load('client:auth2', initClient);
+        }
+
+        // Initialize the Google API client and the auth2 library
+        function initClient() {
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                discoveryDocs: DISCOVERY_DOCS,
+                scope: SCOPES
+            }).then(function () {
+                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+                updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+            }, function (error) {
+                console.error(JSON.stringify(error, null, 2));
             });
         }
 
-        // Handle the response from Google Identity Services (GIS)
-        async function handleCredentialResponse(response) {
-            const token = response.credential; // Extract the credential token
-            console.log('Credential Token:', token); // Log the token to verify
+        // Update the sign-in status
+        function updateSigninStatus(isSignedIn) {
+            if (isSignedIn) {
+                listUpcomingEvents();
+            } else {
+                console.log('User not signed in');
+            }
+        }
 
-            // Initialize Google API client using token
-            await initializeGapiClient();
+        // Sign in the user upon button click
+        function handleAuthClick() {
+            gapi.auth2.getAuthInstance().signIn();
+        }
 
-            // Exchange the token for an OAuth 2.0 access token
-            gapi.client.setToken({ access_token: token });
-
-            // Now list the upcoming events
-            listUpcomingEvents();
+        // Sign out the user
+        function handleSignoutClick() {
+            gapi.auth2.getAuthInstance().signOut();
         }
 
         // Fetch the next upcoming event and update the countdown
@@ -216,7 +221,7 @@
                 }
             }).catch(function(error) {
                 console.error('Error fetching events:', error);
-                document.getElementById('eventDetails').textContent = 'Error fetching events: ' + error.result.error.message;
+                document.getElementById('eventDetails').textContent = 'Error fetching events.';
             });
         }
 
@@ -245,6 +250,11 @@
                 document.getElementById("seconds").textContent = seconds < 10 ? "0" + seconds : seconds;
 
             }, 1000); // Update every second
+        }
+
+        // Load the client library and initialize the app
+        window.onload = function() {
+            handleClientLoad();
         }
     </script>
 </body>
