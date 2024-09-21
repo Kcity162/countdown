@@ -133,7 +133,7 @@
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
-    <p>123</p>
+    <p>Added</p>
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
         <div class="flip-card"><span id="hours">00</span><small>Hours</small></div>
@@ -142,7 +142,7 @@
     </div>
 
     <!-- Add sound element -->
-    <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <audio id="alarmSound" src="./alarm.mp3"></audio>
 
     <script>
         let countdownInterval;
@@ -288,8 +288,15 @@
             const localDate = currentDate.toISOString().slice(0, 16);
             countdownInput.value = localDate;
         }
+        function myFunction() {
+        listUpcomingEvents();
+        console.log("This function runs every minute.");
+        startCountdown();
+        }
 
-    
+        // Run the function every 60,000 milliseconds (1 minute)
+        setInterval(myFunction, 6000);
+
 
     </script>
 </body>
