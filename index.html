@@ -190,7 +190,7 @@
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
-                'maxResults': 5,
+                'maxResults': 5, // << I changed from 1 > 5 to test,
                 'orderBy': 'startTime'
             }).then(function(response) {
                 const events = response.result.items;
