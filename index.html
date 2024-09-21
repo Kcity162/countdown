@@ -136,7 +136,7 @@
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
-    <p>Added my cal account</p>
+    <p>Added kevin.torrington@googlemail.com</p>
 
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
@@ -176,7 +176,7 @@
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() {
             gapi.client.calendar.events.list({
-                'calendarId': 'kevin.torrington@gmail.com',
+                'calendarId': 'kevin.torrington@googlemail.com',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
