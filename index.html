@@ -190,12 +190,11 @@
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
-                'maxResults': 1,
+                'maxResults': 5,
                 'orderBy': 'startTime'
             }).then(function(response) {
                 const events = response.result.items;
                 const eventDetailsElement = document.getElementById('eventDetails');
-                console.log("listUpcomingEvents function ran successfully")
                 if (events.length > 0) {
                     const nextEvent = events[0];
                     const eventTitle = nextEvent.summary || 'No title';
