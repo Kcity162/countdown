@@ -112,7 +112,6 @@
         }
 
     </style>
-    <!-- Load Google API Client Library -->
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
@@ -124,16 +123,17 @@
             <button class="outline-button" onclick="adjustTime(15)">+15 mins</button>
             <button class="outline-button" onclick="adjustTime(25)">+25 mins</button>
         </div>
-        <button onclick="handleAuthClick()">Sign In to Google</button>
+        <button onclick="startCountdown()">Start Countdown</button>
+        <button onclick="resetCountdown()">Reset</button>
+        <button onclick="handleAuthClick()">Login to Google</button>
         <button onclick="listUpcomingEvents()">Get Next Event</button>
     </div>
 
     <!-- Section to display event details -->
     <div class="event-details" id="eventDetails">
         No event loaded.
-        <p>Changed again</p>
     </div>
-
+    <p>123</p>
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
         <div class="flip-card"><span id="hours">00</span><small>Hours</small></div>
@@ -141,8 +141,8 @@
         <div class="flip-card"><span id="seconds">00</span><small>Seconds</small></div>
     </div>
 
-    <!-- Add sound element (using alarm.mp3 in the root of the project) -->
-    <audio id="alarmSound" src="./alarm.mp3"></audio>
+    <!-- Add sound element -->
+    <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
 
     <script>
         let countdownInterval;
@@ -150,12 +150,16 @@
         const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
         const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+        let eventCheckInterval = null;
 
-        function handleClientLoad() {
+
+
+        
+        function loadGoogleAPI() {
             gapi.load('client:auth2', initClient);
         }
 
-        // Initialize the Google API client and the auth2 library
+        // Initialize the Google API client
         function initClient() {
             gapi.client.init({
                 apiKey: API_KEY,
@@ -163,19 +167,18 @@
                 discoveryDocs: DISCOVERY_DOCS,
                 scope: SCOPES
             }).then(function () {
+                // Listen for sign-in state changes
                 gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+                // Handle initial sign-in state
                 updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-            }, function (error) {
-                console.error(JSON.stringify(error, null, 2));
             });
         }
 
-        // Update the sign-in status
+        // Update sign-in status
         function updateSigninStatus(isSignedIn) {
             if (isSignedIn) {
                 listUpcomingEvents();
-            } else {
-                console.log('User not signed in');
             }
         }
 
@@ -184,24 +187,19 @@
             gapi.auth2.getAuthInstance().signIn();
         }
 
-        // Sign out the user
-        function handleSignoutClick() {
-            gapi.auth2.getAuthInstance().signOut();
-        }
-
         // Fetch the next upcoming event and update the countdown
-        function listUpcomingEvents() {
+        function listUpcomingEvents() { 
             gapi.client.calendar.events.list({
-                'calendarId': 'primary',
+                'calendarId': 'kevin.torrington@googlemail.com',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
-                'maxResults': 1,
+                'maxResults': 5, // << I changed from 1 > 5 to test,
                 'orderBy': 'startTime'
             }).then(function(response) {
                 const events = response.result.items;
                 const eventDetailsElement = document.getElementById('eventDetails');
-                
+
                 if (events.length > 0) {
                     const nextEvent = events[0];
                     const eventTitle = nextEvent.summary || 'No title';
@@ -213,9 +211,6 @@
                     // Update countdown input field with the next event's start time
                     const countdownInput = document.getElementById("countdownDate");
                     countdownInput.value = startTime.slice(0, 16);  // Format for input field
-                    
-                    // Automatically start the countdown
-                    startCountdown(new Date(startTime));
                 } else {
                     eventDetailsElement.textContent = 'No upcoming events found.';
                 }
@@ -225,17 +220,42 @@
             });
         }
 
-        // Start the countdown based on the event's start time
-        function startCountdown(eventTime) {
-            if (countdownInterval) clearInterval(countdownInterval); // Clear any existing countdown interval
+        window.onload = function() {
+            loadGoogleAPI();
 
-            countdownInterval = setInterval(function() {
+        };
+
+        function startCountdown() {
+            const inputDate = document.getElementById("countdownDate").value;
+            const countdownDate = new Date(inputDate).getTime();
+            const alarmSound = document.getElementById("alarmSound");
+
+            // Remove the flashing red class if it's present
+            const flipCards = document.querySelectorAll('.flip-card');
+            flipCards.forEach(card => {
+                card.classList.remove('flash-red');
+            });
+
+            if (isNaN(countdownDate)) {
+                alert("Please select a valid date and time.");
+                return;
+            }
+
+            clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(function () {
                 const now = new Date().getTime();
-                const distance = eventTime.getTime() - now;
+                const distance = countdownDate - now;
 
                 if (distance < 0) {
                     clearInterval(countdownInterval);
-                    document.getElementById("alarmSound").play();
+
+                    // Play sound and flash cards
+                    alarmSound.play();
+                    flipCards.forEach(card => {
+                        card.classList.add('flash-red');
+                    });
+
                     return;
                 }
 
@@ -249,13 +269,28 @@
                 document.getElementById("minutes").textContent = minutes < 10 ? "0" + minutes : minutes;
                 document.getElementById("seconds").textContent = seconds < 10 ? "0" + seconds : seconds;
 
-            }, 1000); // Update every second
+            }, 1000);
         }
 
-        // Load the client library and initialize the app
-        window.onload = function() {
-            handleClientLoad();
+
+
+
+        function resetCountdown() {
+            // Add reset logic (same as before)
         }
+
+
+        // Function to adjust time by the specified number of minutes
+        function adjustTime(minutes) {
+            const countdownInput = document.getElementById("countdownDate");
+            let currentDate = new Date(countdownInput.value);
+            currentDate.setMinutes(currentDate.getMinutes() + minutes);
+            const localDate = currentDate.toISOString().slice(0, 16);
+            countdownInput.value = localDate;
+        }
+
+    
+
     </script>
 </body>
 </html>
