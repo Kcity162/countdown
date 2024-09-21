@@ -4,13 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Calendar Event Countdown</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .clock {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flip-card {
+            position: relative;
+            background-color: #333;
+            color: white;
+            font-size: 4em;
+            width: 100px;
+            height: 150px;
+            text-align: center;
+            line-height: 120px;
+            border-radius: 10px;
+        }
+
+        .flip-card span {
+            display: block;
+        }
+
+        .flip-card small {
+            font-size: 0.3em;
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            margin-bottom: 10px;
+        }
+
+        .outline-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #28a745;
+            background-color: white;
+            color: #28a745;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .outline-button:hover {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .flash-red {
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0% { background-color: #333; }
+            50% { background-color: red; }
+            100% { background-color: #333; }
+        }
+
+        /* Event details styling */
+        .event-details {
+            font-size: 1.2em;
+            margin: 20px;
+            color: #333;
+        }
+
+    </style>
+    <!-- Load the new Google Identity Services library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="app.js"></script>
-   
 </head>
 <body>
-    <p>Note: Added my ID</p>
     <div class="input-container">
         <input type="datetime-local" id="countdownDate" />
         <div class="button-container">
@@ -19,20 +124,19 @@
             <button class="outline-button" onclick="adjustTime(15)">+15 mins</button>
             <button class="outline-button" onclick="adjustTime(25)">+25 mins</button>
         </div>
-        <button onclick="handleAuthClick()">Login to Google</button>
+        <div id="g_id_onload"
+             data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
     </div>
 
-    <div id="g_id_onload"
-     data-client_id="769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com"
-     data-callback="handleCredentialResponse"
-     data-auto_prompt="false">
-    </div>
-
-    <div class="g_id_signin" data-type="standard"></div>
     <!-- Section to display event details -->
     <div class="event-details" id="eventDetails">
         No event loaded.
     </div>
+    <p>taken output from Chatgpt</p>
 
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
@@ -41,5 +145,96 @@
         <div class="flip-card"><span id="seconds">00</span><small>Seconds</small></div>
     </div>
 
+    <!-- Add sound element -->
+    <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+    <script>
+        let countdownInterval;
+        const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
+        const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+        const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+        // Handle the response from Google Identity Services (GIS)
+        function handleCredentialResponse(response) {
+            const token = response.credential; // Extract the credential token
+
+            // Initialize the Google API client using the token
+            gapi.load('client', async function() {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: DISCOVERY_DOCS
+                });
+
+                // Set the authorization token
+                gapi.client.setToken({ access_token: token });
+
+                // Now list the upcoming events
+                listUpcomingEvents();
+            });
+        }
+
+        // Fetch the next upcoming event and update the countdown
+        function listUpcomingEvents() {
+            gapi.client.calendar.events.list({
+                'calendarId': 'primary',
+                'timeMin': (new Date()).toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'maxResults': 1,
+                'orderBy': 'startTime'
+            }).then(function(response) {
+                const events = response.result.items;
+                const eventDetailsElement = document.getElementById('eventDetails');
+                
+                if (events.length > 0) {
+                    const nextEvent = events[0];
+                    const eventTitle = nextEvent.summary || 'No title';
+                    const startTime = nextEvent.start.dateTime || nextEvent.start.date;
+                    
+                    // Update event details
+                    eventDetailsElement.innerHTML = `Next Event: <strong>${eventTitle}</strong> at <strong>${new Date(startTime).toLocaleString()}</strong>`;
+                    
+                    // Update countdown input field with the next event's start time
+                    const countdownInput = document.getElementById("countdownDate");
+                    countdownInput.value = startTime.slice(0, 16);  // Format for input field
+                    
+                    // Automatically start the countdown
+                    startCountdown(new Date(startTime));
+                } else {
+                    eventDetailsElement.textContent = 'No upcoming events found.';
+                }
+            }).catch(function(error) {
+                console.error('Error fetching events:', error);
+                document.getElementById('eventDetails').textContent = 'Error fetching events.';
+            });
+        }
+
+        // Start the countdown based on the event's start time
+        function startCountdown(eventTime) {
+            if (countdownInterval) clearInterval(countdownInterval); // Clear any existing countdown interval
+
+            countdownInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = eventTime.getTime() - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("alarmSound").play();
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").textContent = days < 10 ? "0" + days : days;
+                document.getElementById("hours").textContent = hours < 10 ? "0" + hours : hours;
+                document.getElementById("minutes").textContent = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("seconds").textContent = seconds < 10 ? "0" + seconds : seconds;
+
+            }, 1000); // Update every second
+        }
+    </script>
 </body>
 </html>
