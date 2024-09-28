@@ -29,7 +29,7 @@
             width: 140px;
             height: 150px;
             text-align: center;
-            line-height: 210px;
+            line-height: 195px;
             border-radius: 10px;
         }
 
@@ -108,7 +108,7 @@
         .event-details {
             font-size: 1.2em;
             margin: 20px;
-            color: #333;
+            color: white;
         }
 
     </style>
@@ -133,7 +133,9 @@
 
      Section to display event details -->
 
-    
+     <div class="event-details" id="eventDetails">
+        No event loaded.
+    </div>
     <div class="clock" id="clock">
         <div class="flip-card"><span id="days">00</span><small>Days</small></div>
         <div class="flip-card"><span id="hours">00</span><small>Hours</small></div>
@@ -141,9 +143,7 @@
         <div class="flip-card"><span id="seconds">00</span><small>Seconds</small></div>
         
     </div>
-    <div class="event-details" id="eventDetails">
-        No event loaded.
-    </div>
+
     <input type="datetime-local" id="countdownDate" />
     <button onclick="handleAuthClick()">Login to Google</button>
     <audio id="alarmSound" src="./alarm.mp3"></audio> 
@@ -211,7 +211,7 @@
                     const startTime = nextEvent.start.dateTime || nextEvent.start.date;
                     
                     // Update event details
-                    eventDetailsElement.innerHTML = `Next Event: <strong>${eventTitle}</strong> at <strong>${new Date(startTime).toLocaleString()}</strong>`;
+                    eventDetailsElement.innerHTML = `${eventTitle} starts in...`;
                     
                     // Update countdown input field with the next event's start time
                     const countdownInput = document.getElementById("countdownDate");
