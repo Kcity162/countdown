@@ -2,33 +2,79 @@ from icalendar import Calendar, Event
 from datetime import datetime
 import pytz
 
-# Define timezone and create calendar
-tz = pytz.timezone("Europe/London")
+# Create a new iCalendar file
 cal = Calendar()
 
-# Add events
+# Timezone definition
+utc = pytz.UTC
+
+# Events extracted from the PDF, they are tentative placeholders
 events = [
-    {"summary": "Lunch & flow", "start": "2024-09-02 12:00", "end": "2024-09-02 13:00"},
-    {"summary": "Canceled: Manchester", "start": "2024-09-02 09:30", "end": "2024-09-02 10:30"},
-    {"summary": "Canceled: EDF KAR", "start": "2024-09-02 14:30", "end": "2024-09-02 15:30"},
-    {"summary": "Richard <> Kev", "start": "2024-09-04 13:30", "end": "2024-09-04 14:30"},
-    {"summary": "Pickup kids", "start": "2024-09-04 16:00", "end": "2024-09-04 17:00"},
-    {"summary": "Lunch & flow", "start": "2024-09-06 12:00", "end": "2024-09-06 13:00"},
-    {"summary": "Bee Together", "start": "2024-09-06 16:30", "end": "2024-09-06 17:30"},
-    {"summary": "Canceled: Green R", "start": "2024-09-07 10:00", "end": "2024-09-07 11:00"},
-    {"summary": "Canceled: D&R Practice Lead", "start": "2024-09-07 14:00", "end": "2024-09-07 15:00"},
-    {"summary": "Kevin/Jim catch up", "start": "2024-09-08 15:00", "end": "2024-09-08 16:00"},
-    # Add more events as needed
+    {
+        'summary': 'Manchester MG',
+        'start': datetime(2024, 9, 2, 15, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 2, 16, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'Bee Together: S',
+        'start': datetime(2024, 9, 2, 16, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 2, 17, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'D&R Practice Lead',
+        'start': datetime(2024, 9, 3, 14, 0, tzinfo=utc),
+        'end': datetime(2024, 9, 3, 15, 0, tzinfo=utc),
+    },
+    {
+        'summary': 'Richard <> Kev',
+        'start': datetime(2024, 9, 3, 13, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 3, 14, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'Pickup kids',
+        'start': datetime(2024, 9, 4, 16, 0, tzinfo=utc),
+        'end': datetime(2024, 9, 4, 17, 0, tzinfo=utc),
+    },
+    {
+        'summary': 'Manchester People',
+        'start': datetime(2024, 9, 4, 16, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 4, 17, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'BCS - Is it for you?',
+        'start': datetime(2024, 9, 5, 14, 0, tzinfo=utc),
+        'end': datetime(2024, 9, 5, 15, 0, tzinfo=utc),
+    },
+    {
+        'summary': 'Manchester MG',
+        'start': datetime(2024, 9, 6, 15, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 6, 16, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'Manchester MG',
+        'start': datetime(2024, 9, 7, 15, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 7, 16, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'Manchester Month',
+        'start': datetime(2024, 9, 10, 10, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 10, 11, 30, tzinfo=utc),
+    },
+    {
+        'summary': 'Sustainability at the Office',
+        'start': datetime(2024, 9, 11, 11, 30, tzinfo=utc),
+        'end': datetime(2024, 9, 11, 12, 30, tzinfo=utc),
+    }
 ]
 
-# Create events and add to calendar
-for event in events:
-    ical_event = Event()
-    ical_event.add("summary", event["summary"])
-    ical_event.add("dtstart", tz.localize(datetime.strptime(event["start"], "%Y-%m-%d %H:%M")))
-    ical_event.add("dtend", tz.localize(datetime.strptime(event["end"], "%Y-%m-%d %H:%M")))
-    cal.add_component(ical_event)
+# Add events to calendar
+for event_data in events:
+    event = Event()
+    event.add('summary', event_data['summary'])
+    event.add('dtstart', event_data['start'])
+    event.add('dtend', event_data['end'])
+    cal.add_component(event)
 
 # Save to .ics file
-with open('kevin_calendar.ics', 'wb') as f:
+with open('Calendar_Sept_2024.ics', 'wb') as f:
     f.write(cal.to_ical())
