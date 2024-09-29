@@ -57,6 +57,7 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
+            display: none;
         }
 
         .button-container {
@@ -145,8 +146,8 @@
     </div>
 
     <input type="datetime-local" id="countdownDate" />
-    <button onclick="handleAuthClick()">Login to Google</button>
-    <audio id="alarmSound" src="./alarm.mp3"></audio> 
+    <button id="loginButton" onclick="handleAuthClick()">Login to Google</button>
+    <!-- <audio id="alarmSound" src="./ting.mp3"></audio> -->
     
 
     <script>
@@ -155,6 +156,7 @@
         const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
         const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+        var connected = true;
         let eventCheckInterval = null;
 
 
@@ -174,7 +176,7 @@
             }).then(function () {
                 // Listen for sign-in state changes
                 gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
+                
                 // Handle initial sign-in state
                 updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
             });
@@ -184,6 +186,7 @@
         function updateSigninStatus(isSignedIn) {
             if (isSignedIn) {
                 listUpcomingEvents();
+                
             }
         }
 
@@ -194,12 +197,13 @@
 
         // Fetch the next upcoming event and update the countdown
         function listUpcomingEvents() { 
+            
             gapi.client.calendar.events.list({
                 'calendarId': 'kevin.torrington@googlemail.com',
                 'timeMin': (new Date()).toISOString(),
                 'showDeleted': false,
                 'singleEvents': true,
-                'maxResults': 100, // << I changed from 1 > 5 to test,
+                'maxResults': 2, 
                 'orderBy': 'startTime'
             }).then(function(response) {
                 const events = response.result.items;
@@ -212,10 +216,11 @@
                     
                     // Update event details
                     eventDetailsElement.innerHTML = `${eventTitle} starts in...`;
-                    
+                    document.getElementById("loginButton").style.display = "none";
                     // Update countdown input field with the next event's start time
                     const countdownInput = document.getElementById("countdownDate");
                     countdownInput.value = startTime.slice(0, 16);  // Format for input field
+                    startCountdown();
                 } else {
                     eventDetailsElement.textContent = 'No upcoming events found.';
                 }
@@ -242,7 +247,6 @@
             });
 
             if (isNaN(countdownDate)) {
-                
                 return;
             } 
 
@@ -252,17 +256,21 @@
                 const now = new Date().getTime();
                 const distance = countdownDate - now;
 
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
+if (distance < 0) {
+            clearInterval(countdownInterval);
 
-                    // Play sound and flash cards
-                    alarmSound.play();
-                    flipCards.forEach(card => {
-                        card.classList.add('flash-red');
-                    });
+            // Play sound and flash cards
+            alarmSound.play();
+            flipCards.forEach(card => {
+                card.classList.add('flash-red');
+            });
 
-                    return;
-                }
+            // Automatically fetch the next event and start the countdown
+            listUpcomingEvents(); // Fetch and start countdown for the next event
+
+            return;
+        }
+
 
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -276,7 +284,6 @@
 
             }, 1000);
         }
-
 
 
 
@@ -295,10 +302,11 @@
         }
         function myFunction() {
         listUpcomingEvents();
-        console.log("This function runs every minute.");
+        console.log("This function runs every 60 sec.");
         startCountdown();
         }
 
+    
         // Run the function every 60,000 milliseconds (1 minute)
         setInterval(myFunction, 6000);
 
