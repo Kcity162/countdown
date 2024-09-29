@@ -3,7 +3,6 @@ const CLIENT_ID = '769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleuser
 const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
-var connected = true;
 let eventCheckInterval = null;
 
 
@@ -21,10 +20,11 @@ function initClient() {
         scope: SCOPES
     }).then(function () {
         // Listen for sign-in state changes
-        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-        // Handle initial sign-in state
-        updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+        var signedIn = gapi.auth2.getAuthInstance().isSignedIn
+        
+        signedIn.listen(updateSigninStatus);
+        updateSigninStatus(signedIn.get());
+        
     });
 }
 
@@ -53,27 +53,35 @@ function listUpcomingEvents() {
         'orderBy': 'startTime'
     }).then(function(response) {
         const events = response.result.items;
-        const eventDetailsElement = document.getElementById('eventDetails');
         console.log(events);
+        console.log(new Date(events[0].start.dateTime).getTime());
+        console.log(new Date().getTime());
         if (events.length > 0) {
-            const nextEvent = events[0];
-            const eventTitle = nextEvent.summary || 'No title';
-            const startTime = nextEvent.start.dateTime || nextEvent.start.date;
-
-            // Update event details
-            eventDetailsElement.innerHTML = `${eventTitle}`;
-            document.getElementById("loginButton").style.display = "none";
-            // Update countdown input field with the next event's start time
-            const countdownInput = document.getElementById("countdownDate");
-            countdownInput.value = startTime.slice(0, 16);  // Format for input field
-            startCountdown();
+            if (new Date(events[0].start.dateTime).getTime() < new Date().getTime()) {
+                showEvent(events[1])
+            } else {
+                showEvent(events[0])
+            }
         } else {
-            eventDetailsElement.textContent = 'No upcoming events found.';
+            document.getElementById('eventDetails').textContent = 'No upcoming events found.';
         }
     }).catch(function(error) {
         console.error('Error fetching events:', error);
         document.getElementById('eventDetails').textContent = 'Error fetching events.';
     });
+}
+
+function showEvent(event) {
+    const eventTitle = event.summary || 'No title';
+    const startTime = event.start.dateTime || event.start.date;
+
+    // Update event details
+    document.getElementById('eventDetails').innerHTML = `${eventTitle}`;
+    document.getElementById("loginButton").style.display = "none";
+    // Update countdown input field with the next event's start time
+    const countdownInput = document.getElementById("countdownDate");
+    countdownInput.value = startTime.slice(0, 16);  // Format for input field
+    startCountdown();
 }
 
 window.onload = function() {
