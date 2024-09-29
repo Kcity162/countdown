@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: none;
+}
+
+.clock {
+    display: flex;
+    gap: 10px;
+}
+
+.flip-card {
+    position: relative;
+    justify-items: center;
+    background-color: whitesmoke;
+    color: #333;
+    font-size: 8em;
+    width: 240px;
+    height: 180px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.flip-card span {
+    display: block;
+}
+
+.flip-card small {
+    font-size: 0.3em;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.input-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    display: none;
+}
+
+.button-container {
+    margin-bottom: 10px;
+}
+
+.outline-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #28a745;
+    background-color: white;
+    color: #28a745;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.outline-button:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    margin: 10px 5px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.flash-red {
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0% { background-color: whitesmoke; }
+    50% { background-color: red; }
+    100% { background-color: whitesmoke; }
+}
+
+/* Event details styling */
+.event-details {
+    margin: 20px;
+    position: relative;
+    background-color: whitesmoke;
+    color: #333;
+    font-size: 3em;
+    text-align: center;
+    border-radius: 10px;
+    padding: 8px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 10px;
+}
