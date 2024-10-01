@@ -1,6 +1,5 @@
 let countdownInterval;
 const CLIENT_ID = '769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyBu04Y579ndaDSIOYJWAu90GYgqtd31jf0';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 let eventCheckInterval = null;
@@ -76,7 +75,7 @@ function showEvent(event) {
     const startTime = event.start.dateTime || event.start.date;
 
     // Update event details
-    document.getElementById('eventDetails').innerHTML = `${eventTitle}`;
+    document.getElementById('eventDetails').innerHTML = `${eventTitle} : ${event.start.dateTime}`;
     document.getElementById("loginButton").style.display = "none";
     // Update countdown input field with the next event's start time
     const countdownInput = document.getElementById("countdownDate");
