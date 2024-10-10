@@ -76,7 +76,7 @@ function showEvent(event) {
     const startTime = event.start.dateTime || event.start.date;
 
     // Update event details
-    document.getElementById('eventDetails').innerHTML = `${eventTitle} : ${event.start.dateTime}`;
+    document.getElementById('eventDetails').innerHTML = `${eventTitle}`;
     document.getElementById("loginButton").style.display = "none";
     // Update countdown input field with the next event's start time
     const countdownInput = document.getElementById("countdownDate");
