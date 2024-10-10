@@ -1,5 +1,6 @@
 let countdownInterval;
 const CLIENT_ID = '769884879774-heoerr8safevh14ie8uk03f1pp3i4oa7.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyCKdG_iM946mewu5RInoVvJ1ED_S-KZPZI';
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 let eventCheckInterval = null;
