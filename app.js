@@ -49,7 +49,7 @@ function listUpcomingEvents() {
         'timeMin': (new Date()).toISOString(),
         'showDeleted': false,
         'singleEvents': true,
-        'maxResults': 4,
+        'maxResults': 5,
         'orderBy': 'startTime'
     }).then(function(response) {
         const events = response.result.items;
@@ -97,6 +97,16 @@ function listUpcomingEvents() {
             hour: "2-digit",
             minute: "2-digit",
           });
+        let event4Name = events[4].summary
+        let event4IsoDate = events[4].start.dateTime
+        let event4Date = new Date(event4IsoDate);
+        const event4ReadablereadableDate = event4Date.toLocaleString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
 
 
@@ -108,6 +118,8 @@ function listUpcomingEvents() {
         document.getElementById("event2Start").textContent = event2ReadablereadableDate;
         document.getElementById("event3").textContent = event3Name;
         document.getElementById("event3Start").textContent = event3ReadablereadableDate;
+        document.getElementById("event4").textContent = event3Name;
+        document.getElementById("event4Start").textContent = event3ReadablereadableDate;
 
 
         if (events.length > 0) {
