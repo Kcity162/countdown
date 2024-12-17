@@ -114,3 +114,31 @@ button:hover {
     padding-right: 4rem;
     margin-bottom: 1rem;
 }
+
+.upcoming {
+    color: white;
+    font-size: 2rem;
+}
+
+.next-event {
+    margin: 20px;
+    position: relative;
+    background-color: whitesmoke;
+    color: #727272;
+    font-size: .8em;
+    text-align: center;
+    border-radius: 10px;
+    padding: .5rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
+    margin-bottom: .5rem;
+}
+
+.event-name {
+    color: #333;
+}
+
+p {
+    margin-top: 0;    /* Removes space above */
+    margin-bottom: 10px; /* Adds 10px spacing below each paragraph */
+  }

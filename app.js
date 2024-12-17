@@ -49,13 +49,55 @@ function listUpcomingEvents() {
         'timeMin': (new Date()).toISOString(),
         'showDeleted': false,
         'singleEvents': true,
-        'maxResults': 2,
+        'maxResults': 3,
         'orderBy': 'startTime'
     }).then(function(response) {
         const events = response.result.items;
-        console.log(events);
-        console.log(new Date(events[0].start.dateTime).getTime());
-        console.log(new Date().getTime());
+        let event0Name = events[0].summary
+        let event0IsoDate = events[0].start.dateTime
+        let event0Date = new Date(event0IsoDate);
+        const event0ReadablereadableDate = event0Date.toLocaleString("en-US", {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+
+        let event1Name = events[1].summary
+        let event1IsoDate = events[1].start.dateTime
+        let event1Date = new Date(event1IsoDate);
+        const event1ReadablereadableDate = event1Date.toLocaleString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+
+        let event2Name = events[2].summary
+        let event2IsoDate = events[2].start.dateTime
+        let event2Date = new Date(event2IsoDate);
+        const event2ReadablereadableDate = event2Date.toLocaleString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+
+
+        document.getElementById("event0").textContent = event0Name;
+        document.getElementById("event0Start").textContent = event0ReadablereadableDate;
+        document.getElementById("event1").textContent = event1Name;
+        document.getElementById("event1Start").textContent = event1ReadablereadableDate;
+        document.getElementById("event2").textContent = event2Name;
+        document.getElementById("event2Start").textContent = event2ReadablereadableDate;
+
+
         if (events.length > 0) {
             if (new Date(events[0].start.dateTime).getTime() < new Date().getTime()) {
                 showEvent(events[1])
@@ -151,7 +193,6 @@ function adjustTime(minutes) {
 }
 function myFunction() {
 listUpcomingEvents();
-console.log("This function runs every 60 sec.");
 startCountdown();
 }
 
