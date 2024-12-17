@@ -118,8 +118,8 @@ function listUpcomingEvents() {
         document.getElementById("event2Start").textContent = event2ReadablereadableDate;
         document.getElementById("event3").textContent = event3Name;
         document.getElementById("event3Start").textContent = event3ReadablereadableDate;
-        document.getElementById("event4").textContent = event3Name;
-        document.getElementById("event4Start").textContent = event3ReadablereadableDate;
+        document.getElementById("event4").textContent = event4Name;
+        document.getElementById("event4Start").textContent = event4ReadablereadableDate;
 
 
         if (events.length > 0) {
