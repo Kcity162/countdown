@@ -123,7 +123,7 @@ button:hover {
 .next-event {
     margin: 20px;
     position: relative;
-    background-color: whitesmoke;
+    background-color: rgba(245, 245, 245, 0.2);
     color: #727272;
     font-size: .8em;
     text-align: center;
@@ -135,7 +135,8 @@ button:hover {
 }
 
 .event-name {
-    color: #333;
+    color: whitesmoke;
+    font-weight: 600;
 }
 
 p {
